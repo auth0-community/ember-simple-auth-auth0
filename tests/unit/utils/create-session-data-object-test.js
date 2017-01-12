@@ -40,7 +40,7 @@ test('it merges the profile and token info, ignoring a previous profile attribut
   let expectedResult = {
     idToken: 'aaa.bbb.ccc',
     profile: { my_key: 'foo' }
-  }
+  };
 
   let result = createSessionDataObject(profile, tokenInfo);
   assert.deepEqual(result, expectedResult);
