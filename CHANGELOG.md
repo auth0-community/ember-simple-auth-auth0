@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.2.2 (February 10th, 2017)
+
+- [#35](https://github.com/seawatts/ember-simple-auth-auth0/issues/35) **bugfix**: Lock Auth0.js version to ~7.6.x
+
 ## v2.2.1 (January 22nd, 2017)
 
 ### Pull Requests
