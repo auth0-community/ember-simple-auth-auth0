@@ -2,7 +2,7 @@
   "name": "ember-simple-auth-auth0",
   "dependencies": {
     "auth0-lock": "^10.10.1",
-    "auth0.js": "^7.6.0",
+    "auth0.js": "~7.6.0",
     "ember": "~2.10.2",
     "ember-cli-shims": "0.1.3"
   }
