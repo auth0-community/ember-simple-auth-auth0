@@ -6,6 +6,8 @@
 
 const path = require('path');
 const fs = require('fs');
+const Funnel = require('broccoli-funnel');
+const MergeTrees = require('broccoli-merge-trees');
 
 module.exports = {
   name: 'ember-simple-auth-auth0',
@@ -46,7 +48,7 @@ module.exports = {
         (content) => `if (typeof FastBoot === 'undefined') { ${content} }`
       );
 
-      return new mergeTrees([defaultTree, browserVendorLib]);
+      return new MergeTrees([defaultTree, browserVendorLib]);
     } else {
       return defaultTree;
     }
