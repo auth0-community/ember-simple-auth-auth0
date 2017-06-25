@@ -9,10 +9,6 @@ module.exports = {
   included: function(app) {
     this._super.included(app);
 
-    app.import(app.bowerDirectory + '/auth0-lock/build/lock.js');
-    app.import(app.bowerDirectory + '/auth0-lock-passwordless/build/lock-passwordless.js');
-    app.import(app.bowerDirectory + '/auth0.js/build/auth0.js');
-
     app.import('vendor/lock.js', {
       exports: {
         'auth0-lock': ['default']
@@ -33,6 +29,25 @@ module.exports = {
 
     // this.import('vendor/ember-simple-auth/register-version.js');
   },
+
+  treeForVendor: function(defaultTree) {
+    const app = this._findHost();
+    const assetPath =path.join(__dirname, app.bowerDirectory);
+
+    if (fs.existsSync(assetPath)) {
+      let browserVendorLib = new Funnel(assetPath, {
+        files: ['auth0-lock/build/lock.js', 'auth0-lock-passwordless/build/lock-passwordless.js', 'auth0.js/build/auth0.js']
+      });
+
+      browserVendorLib = map(browserVendorLib,
+        (content) => `if (typeof FastBoot === 'undefined') { ${content} }`
+      );
+
+      return new mergeTrees([defaultTree, browserVendorLib]);
+    } else {
+      return defaultTree;
+    }
+  }
 
   // treeForVendor: function() {
   //   var emberSimpleAuthAuth0 = 'Ember.libraries.register(\'Ember Simple Auth Auth0\', \'' + version + '\');\n';
