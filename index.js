@@ -5,14 +5,19 @@
 // var version = require('./bower.json').dependencies['auth0.js'];
 
 const path = require('path');
-const fs = require('fs');
 const Funnel = require('broccoli-funnel');
 const MergeTrees = require('broccoli-merge-trees');
+const fastbootTransform = require('fastboot-transform');
+const existsSync = require('exists-sync');
 
 module.exports = {
   name: 'ember-simple-auth-auth0',
   included: function(app) {
     this._super.included(app);
+
+    // app.import(app.bowerDirectory + '/auth0-lock/build/lock.js');
+    // app.import(app.bowerDirectory + '/auth0-lock-passwordless/build/lock-passwordless.js');
+    // app.import(app.bowerDirectory + '/auth0.js/build/auth0.js');
 
     app.import('vendor/lock.js', {
       exports: {
@@ -37,16 +42,12 @@ module.exports = {
 
   treeForVendor: function(defaultTree) {
     const app = this._findHost();
-    const assetPath =path.join(__dirname, app.bowerDirectory);
+    const assetPath = path.join(__dirname, app.bowerDirectory);
 
-    if (fs.existsSync(assetPath)) {
-      let browserVendorLib = new Funnel(assetPath, {
+    if (existsSync(assetPath)) {
+      let browserVendorLib = fastbootTransform(new Funnel(assetPath, {
         files: ['auth0-lock/build/lock.js', 'auth0-lock-passwordless/build/lock-passwordless.js', 'auth0.js/build/auth0.js']
-      });
-
-      browserVendorLib = map(browserVendorLib,
-        (content) => `if (typeof FastBoot === 'undefined') { ${content} }`
-      );
+      }));
 
       return new MergeTrees([defaultTree, browserVendorLib]);
     } else {
