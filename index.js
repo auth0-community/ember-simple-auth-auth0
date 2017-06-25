@@ -4,6 +4,9 @@
 // var version = require('./package.json').version;
 // var version = require('./bower.json').dependencies['auth0.js'];
 
+const path = require('path');
+const fs = require('fs');
+
 module.exports = {
   name: 'ember-simple-auth-auth0',
   included: function(app) {
