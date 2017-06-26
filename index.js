@@ -42,14 +42,24 @@ module.exports = {
 
   treeForVendor: function(defaultTree) {
     const app = this._findHost();
-    const assetPath = path.join(__dirname, app.bowerDirectory);
+    const lockPath = path.join(this.project.root, this.app.bowerDirectory, 'auth0-lock', 'build');
+    const passwordlessPath = path.join(this.project.root, this.app.bowerDirectory, 'auth0-lock-passwordless', 'build');
+    const auth0Path = path.join(this.project.root, this.app.bowerDirectory, 'auth0.js', 'build');
 
-    if (existsSync(assetPath)) {
-      let browserVendorLib = fastbootTransform(new Funnel(assetPath, {
-        files: ['auth0-lock/build/lock.js', 'auth0-lock-passwordless/build/lock-passwordless.js', 'auth0.js/build/auth0.js']
+    if (existsSync(lockPath) && existsSync(passwordlessPath) && existsSync(auth0Path)) {
+      let lockVendorLib = fastbootTransform(new Funnel(lockPath, {
+        files: ['lock.js']
       }));
 
-      return new MergeTrees([defaultTree, browserVendorLib]);
+      let passwordlessVendorLib = fastbootTransform(new Funnel(passwordlessPath, {
+        files: ['lock-passwordless.js']
+      }));
+
+      let auth0VendorLib = fastbootTransform(new Funnel(auth0Path, {
+        files: ['auth0.js']
+      }));
+
+      return new MergeTrees([defaultTree, lockVendorLib, passwordlessVendorLib, auth0VendorLib], { overwrite: true });
     } else {
       return defaultTree;
     }
