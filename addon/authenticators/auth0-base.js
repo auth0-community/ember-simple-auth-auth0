@@ -1,14 +1,8 @@
-import Ember from 'ember';
+import RSVP from 'rsvp';
+import { inject as service } from '@ember/service';
 import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
 import getSessionExpiration from '../utils/get-session-expiration';
 import now from '../utils/now';
-
-const {
-  RSVP,
-  inject: {
-    service
-  },
-} = Ember;
 
 export default BaseAuthenticator.extend({
   auth0: service(),

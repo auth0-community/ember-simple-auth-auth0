@@ -1,17 +1,8 @@
-import Ember from 'ember';
+import Controller from '@ember/controller';
+import { inject as service } from '@ember/service';
+import { alias } from '@ember/object/computed';
+import { get, computed } from '@ember/object';
 import moment from 'moment';
-
-const {
-  Controller,
-  inject: {
-    service,
-  },
-  computed,
-  computed: {
-    alias,
-  },
-  get,
-} = Ember;
 
 export default Controller.extend({
   session: service(),

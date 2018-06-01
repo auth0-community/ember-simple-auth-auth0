@@ -1,15 +1,11 @@
+import Controller from '@ember/controller';
+import { inject as service } from '@ember/service';
+import { alias } from '@ember/object/computed';
+import { get } from '@ember/object';
 import Ember from 'ember';
 
 const {
-  Controller,
-  inject: {
-    service,
-  },
-  computed: {
-    alias,
-  },
-  get,
-  Logger,
+  Logger
 } = Ember;
 
 export default Controller.extend({

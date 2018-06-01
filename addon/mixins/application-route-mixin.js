@@ -1,29 +1,23 @@
-import Ember from 'ember';
+import Mixin from '@ember/object/mixin';
+import { set, getWithDefault, get, computed } from '@ember/object';
+import RSVP, { resolve } from 'rsvp';
+import { inject as service } from '@ember/service';
+import { run } from '@ember/runloop';
+import { isEmpty } from '@ember/utils';
+import { getOwner } from '@ember/application';
 import ApplicationRouteMixin from 'ember-simple-auth/mixins/application-route-mixin';
 import { Auth0Error } from '../utils/errors'
 import getSessionExpiration from '../utils/get-session-expiration';
 import now from '../utils/now';
 
-const {
-  Mixin,
-  computed,
-  get,
-  getWithDefault,
-  set,
-  RSVP,
-  RSVP: {
-    resolve
-  },
-  inject: {
-    service
-  },
-  run,
-  isEmpty,
-} = Ember;
-
 export default Mixin.create(ApplicationRouteMixin, {
   session: service(),
   auth0: service(),
+
+  inTesting: computed(function() {
+    let config = getOwner(this).resolveRegistration('config:environment');
+    return config.environment === 'test';
+  }),
 
   sessionAuthenticated() {
     this._setupFutureEvents();
@@ -93,7 +87,7 @@ export default Mixin.create(ApplicationRouteMixin, {
   },
 
   _clearUrlHash() {
-    if(!Ember.testing && window.history) {
+    if(!this.get('inTesting') && window.history) {
       window.history.pushState('', document.title, window.location.pathname + window.location.search);
     }
     return RSVP.resolve()
@@ -101,7 +95,7 @@ export default Mixin.create(ApplicationRouteMixin, {
 
   _setupFutureEvents() {
     // Don't schedule expired events during testing, otherwise acceptance tests will hang.
-    if (Ember.testing) {
+    if (this.get('inTesting')) {
       return;
     }
 

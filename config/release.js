@@ -1,6 +1,8 @@
-/* jshint node:true */
+'use strict';
+
 const generateChangelog = require('ember-cli-changelog/lib/tasks/release-with-changelog');
-const { exec } = require('child_process');
+const child_process = require('child_process');
+const exec = child_process.exec;
 
 // For details on each option run `ember help release`
 module.exports = {
@@ -15,7 +17,7 @@ module.exports = {
   },
 
   beforeCommit() {
-    return generateChangelog(...arguments);
+    return generateChangelog(...arguments); // eslint-disable-line node/no-unsupported-features
   }
 };
 

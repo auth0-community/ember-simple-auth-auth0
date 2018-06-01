@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import { assign } from '@ember/polyfills';
 import createSessionDataObject from 'dummy/utils/create-session-data-object';
 import {
   module,
@@ -8,70 +8,67 @@ import {
 import { freezeDateAt, unfreezeDate } from 'ember-mockdate-shim';
 import now from 'ember-simple-auth-auth0/utils/now';
 
-const assign = Ember.assign || Ember.merge;
+module('Unit | Utility | create session data object', function() {
+  test('it merges the profile and token info', function(assert) {
+    freezeDateAt(new Date('1993-12-10T08:44:00'));
+    assert.expect(1);
 
-module('Unit | Utility | create session data object');
+    const issuedAt = now();
 
-test('it merges the profile and token info', function(assert) {
-  freezeDateAt(new Date('1993-12-10T08:44:00'));
-  assert.expect(1);
+    let profile = {
+      my_key: 'foo'
+    };
 
-  const issuedAt = now();
+    let tokenInfo = {
+      idToken: 'aaa.bbbb.ccc'
+    };
 
-  let profile = {
-    my_key: 'foo'
-  };
+    let expectedResult = { issuedAt: issuedAt };
+    assign(expectedResult, { profile }, tokenInfo);
 
-  let tokenInfo = {
-    idToken: 'aaa.bbbb.ccc'
-  };
+    let result = createSessionDataObject(profile, tokenInfo);
+    assert.deepEqual(result, expectedResult);
+    unfreezeDate();
+  });
 
-  let expectedResult = { issuedAt: issuedAt };
-  assign(expectedResult, { profile });
-  assign(expectedResult, tokenInfo);
+  test('it merges the profile and token info, ignoring a previous profile attribute', function(assert) {
+    freezeDateAt(new Date('1993-12-10T08:44:00'));
+    assert.expect(1);
 
-  let result = createSessionDataObject(profile, tokenInfo);
-  assert.deepEqual(result, expectedResult);
-  unfreezeDate();
-});
+    const issuedAt = now();
 
-test('it merges the profile and token info, ignoring a previous profile attribute', function(assert) {
-  freezeDateAt(new Date('1993-12-10T08:44:00'));
-  assert.expect(1);
+    let profile = {
+      my_key: 'foo'
+    };
 
-  const issuedAt = now();
+    let tokenInfo = {
+      idToken: 'aaa.bbbb.ccc',
+      profile: { some: 'stuff' }
+    };
 
-  let profile = {
-    my_key: 'foo'
-  };
+    let expectedResult = {
+      issuedAt: issuedAt,
+      idToken: 'aaa.bbbb.ccc',
+      profile,
+    };
 
-  let tokenInfo = {
-    idToken: 'aaa.bbbb.ccc',
-    profile: { some: 'stuff' }
-  };
+    let result = createSessionDataObject(profile, tokenInfo);
+    assert.deepEqual(result, expectedResult);
+    unfreezeDate();
+  });
 
-  let expectedResult = {
-    issuedAt: issuedAt,
-    idToken: 'aaa.bbbb.ccc',
-    profile,
-  };
+  test('it issues a creation timestamp', function(assert) {
+    assert.expect(1);
 
-  let result = createSessionDataObject(profile, tokenInfo);
-  assert.deepEqual(result, expectedResult);
-  unfreezeDate();
-});
+    let profile = {
+      my_key: 'foo'
+    };
 
-test('it issues a creation timestamp', function(assert) {
-  assert.expect(1);
+    let tokenInfo = {
+      idToken: 'aaa.bbbb.ccc'
+    };
 
-  let profile = {
-    my_key: 'foo'
-  };
-
-  let tokenInfo = {
-    idToken: 'aaa.bbbb.ccc'
-  };
-
-  let result = createSessionDataObject(profile, tokenInfo);
-  assert.ok(result.issuedAt);
+    let result = createSessionDataObject(profile, tokenInfo);
+    assert.ok(result.issuedAt);
+  });
 });

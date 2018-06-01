@@ -1,4 +1,3 @@
-/* jshint node: true */
 'use strict';
 
 const path = require('path');
@@ -37,7 +36,7 @@ module.exports = {
   included: function(app) {
     this._super.included(app);
 
-    app.import('vendor/auth0-js.js'  , transformAMD('auth0'     ));
+    app.import('vendor/auth0-js.js', transformAMD('auth0'));
     app.import('vendor/auth0-lock.js', transformAMD('auth0-lock'));
 
     return app;
@@ -45,13 +44,13 @@ module.exports = {
 
   treeForVendor: function(vendorTree) {
       const trees = [];
-      if(vendorTree) {
+      if (vendorTree) {
         trees.push(vendorTree);
       }
 
       // [XA] use webpack to transform the CommonJS libs to AMD so we can import 'em.
 
-      trees.push(webpackify('auth0-js'  , 'src'));
+      trees.push(webpackify('auth0-js', 'src'));
       trees.push(webpackify('auth0-lock', 'lib'));
 
       return new MergeTrees(trees);

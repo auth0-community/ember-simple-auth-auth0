@@ -1,16 +1,10 @@
-import Ember from 'ember';
+import RSVP from 'rsvp';
+import { get } from '@ember/object';
+import { inject as service } from '@ember/service';
+import { isEmpty } from '@ember/utils';
 import Auth0BaseAuthenticator from 'ember-simple-auth-auth0/authenticators/auth0-base';
 import createSessionDataObject from '../utils/create-session-data-object';
 import { Auth0Error } from '../utils/errors'
-
-const {
-  RSVP,
-  get,
-  inject: {
-    service
-  },
-  isEmpty,
-} = Ember;
 
 export default Auth0BaseAuthenticator.extend({
   auth0: service(),

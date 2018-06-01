@@ -1,9 +1,6 @@
-import Ember from 'ember';
+import { isPresent } from '@ember/utils';
+import { debug } from '@ember/debug';
 import BaseAuthorizer from 'ember-simple-auth/authorizers/base';
-const {
-  isPresent,
-  debug
-} = Ember;
 
 export default BaseAuthorizer.extend({
   authorize(sessionData, block) {

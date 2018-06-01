@@ -1,28 +1,23 @@
-import Ember from 'ember';
+import { readOnly } from '@ember/object/computed';
+import { getOwner } from '@ember/application';
+import { getProperties, get, computed } from '@ember/object';
+import { assert } from '@ember/debug';
+import { isEmpty } from '@ember/utils';
+import Service, { inject as service } from '@ember/service';
+import RSVP from 'rsvp';
 import Auth0 from 'auth0';
 import { Auth0Lock, Auth0LockPasswordless } from 'auth0-lock';
 import createSessionDataObject from '../utils/create-session-data-object';
 import { Auth0Error } from '../utils/errors'
 
-const {
-  Service,
-  computed,
-  computed: {
-    readOnly,
-  },
-  get,
-  getOwner,
-  getProperties,
-  assert,
-  isEmpty,
-  inject: {
-    service
-  },
-  RSVP,
-} = Ember;
-
 export default Service.extend({
   session: service(),
+
+  inTesting: computed(function() {
+    let config = getOwner(this).resolveRegistration('config:environment');
+    return config.environment === 'test';
+  }),
+
   /**
    * The env config found in the environment config.
    * ENV['ember-simple-auth'].auth0
@@ -118,7 +113,7 @@ export default Service.extend({
     
     logoutReturnToURL = logoutUrl || logoutReturnToURL;
 
-    if (!Ember.testing) {
+    if (!this.get('inTesting')) {
       window.location.replace(`https://${domain}/v2/logout?returnTo=${logoutReturnToURL}&client_id=${clientID}`);
     }
   },

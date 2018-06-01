@@ -1,8 +1,4 @@
-import Ember from 'ember';
-const {
-  get,
-  getWithDefault
-} = Ember;
+import { getWithDefault, get } from '@ember/object';
 
 /**
  * Get the token expiration time from the specified session data object.

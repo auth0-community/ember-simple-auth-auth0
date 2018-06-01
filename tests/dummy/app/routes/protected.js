@@ -1,9 +1,9 @@
+import Route from '@ember/routing/route';
 import Ember from 'ember';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 const {
-  Route,
-  Logger,
+  Logger
 } = Ember;
 
 export default Route.extend(AuthenticatedRouteMixin, {

@@ -1,9 +1,10 @@
-/*jshint node:true*/
+'use strict';
+
 module.exports = function(app) {
   const postsRoute = require('./mocks/posts.js');
 
   // Log proxy requests
-  var morgan = require('morgan');
+  let morgan = require('morgan');
   app.use(morgan('dev'));
   postsRoute(app);
 };

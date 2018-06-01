@@ -1,71 +1,62 @@
-import Ember from 'ember';
-import { test } from 'qunit';
-import moduleForAcceptance from '../../../tests/helpers/module-for-acceptance';
-import { authenticateSession, currentSession } from 'dummy/tests/helpers/ember-simple-auth';
-import { mockAuth0Lock } from 'dummy/tests/helpers/ember-simple-auth-auth0';
+import { currentURL } from '@ember/test-helpers';
+import { get } from '@ember/object';
+import { module, test } from 'qunit';
+import { setupApplicationTest } from 'ember-qunit';
+import { currentSession, authenticateSession} from 'ember-simple-auth/test-support';
+import { mockAuth0Lock } from 'ember-simple-auth-auth0/test-support';
 import page from '../../pages/login';
 
-const {
-  get
-} = Ember;
+module('Acceptance | login', function(hooks) {
+  setupApplicationTest(hooks);
 
-moduleForAcceptance('Acceptance | login');
+  test('visiting /login goes to login page if unauthenticated', async function(assert) {
+    assert.expect(1);
+    await page.visit();
 
-test('visiting /login goes to login page if unauthenticated', function(assert) {
-  assert.expect(1);
-  page.visit();
-
-  andThen(() => {
     assert.equal(currentURL(), '/login');
   });
-});
 
-test('visiting /login redirects to /protected page if authenticated', function(assert) {
-  assert.expect(1);
-  page.visit();
-  authenticateSession(this.application);
+  test('visiting /login redirects to /protected page if authenticated', async function(assert) {
+    assert.expect(1);
+    await page.visit();
+    await authenticateSession();
 
-  andThen(() => {
     assert.equal(currentURL(), '/protected');
   });
-});
 
-test('it mocks the auth0 lock login and logs in the user', function(assert) {
-  assert.expect(2);
-  const sessionData = {
-    idToken: 1,
-    expiresIn: 3600
-  };
+  test('it mocks the auth0 lock login and logs in the user', async function(assert) {
+    assert.expect(2);
+    const sessionData = {
+      idToken: 1,
+      expiresIn: 3600
+    };
 
-  mockAuth0Lock(this.application, sessionData);
+    await mockAuth0Lock(sessionData);
 
-  page
-    .visit()
-    .login();
+    await page
+      .visit()
+      .login();
 
-  andThen(() => {
-    let session = currentSession(this.application);
+    let session = currentSession();
     let idToken = get(session, 'data.authenticated.idToken');
     assert.equal(idToken, sessionData.idToken);
     assert.equal(currentURL(), '/protected');
   });
-});
 
-test('it mocks the auth0 lock login again and logs in a different user', function(assert) {
-  assert.expect(2);
-  const sessionData = {
-    idToken: 2,
-    expiresIn: 3600
-  };
+  test('it mocks the auth0 lock login again and logs in a different user', async function(assert) {
+    assert.expect(2);
+    const sessionData = {
+      idToken: 2,
+      expiresIn: 3600
+    };
 
-  mockAuth0Lock(this.application, sessionData);
+    await mockAuth0Lock(sessionData);
 
-  page
-    .visit()
-    .login();
+    await page
+      .visit()
+      .login();
 
-  andThen(() => {
-    let session = currentSession(this.application);
+    let session = currentSession();
     let idToken = get(session, 'data.authenticated.idToken');
     assert.equal(idToken, sessionData.idToken);
     assert.equal(currentURL(), '/protected');

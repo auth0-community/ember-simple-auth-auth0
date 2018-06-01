@@ -1,3 +1,4 @@
+import EmObject from '@ember/object';
 import Ember from 'ember';
 import {
   test,
@@ -7,7 +8,6 @@ import {
 const {
   _RegistryProxyMixin,
   _ContainerProxyMixin,
-  Object: EmObject,
   Registry
 } = Ember;
 

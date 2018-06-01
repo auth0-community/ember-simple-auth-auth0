@@ -1,21 +1,17 @@
-import Ember from 'ember';
+import { assign } from '@ember/polyfills';
+import EmberObject, { set, get } from '@ember/object';
+import Evented from '@ember/object/evented';
 import test from 'ember-sinon-qunit/test-support/test';
 import sinon from 'sinon';
 import createSessionDataObject from 'ember-simple-auth-auth0/utils/create-session-data-object';
 
+import { module } from 'qunit';
+
 import {
-  moduleFor,
+  setupTest,
 } from 'ember-qunit';
 
-const {
-  get,
-  set,
-  Evented,
-} = Ember;
-
-const assign = Ember.assign || Ember.merge;
-
-const StubLock = Ember.Object.extend(Evented, {
+const StubLock = EmberObject.extend(Evented, {
   profile: null,
   shouldThrowGetUserInfoError: false,
   getUserInfo(idToken, callback) {
@@ -28,137 +24,141 @@ const StubLock = Ember.Object.extend(Evented, {
   show: sinon.stub(),
 });
 
-moduleFor('service:auth0', 'Unit | Service | auth0', {
-  // Specify the other units that are required for this test.
-  needs: ['service:session'],
-  registerConfig(config) {
-    const defaultConfig = {
-      rootURL: '/test',
-      ['ember-simple-auth']: {
-        auth0: {}
-      }
+module('Unit | Service | auth0', function(hooks) {
+  setupTest(hooks);
+
+  hooks.beforeEach(function() {
+    this.registerConfig = function(config) {
+      const defaultConfig = {
+        rootURL: '/test',
+        ['ember-simple-auth']: {
+          auth0: {}
+        }
+      };
+
+      config = assign(defaultConfig, config);
+      this.owner.register('config:environment', config);
+      return config;
     };
 
-    config = assign(defaultConfig, config);
-    this.register('config:environment', config);
-    return config;
-  },
-  stubLock(stubbedLock) {
-    stubbedLock = stubbedLock || new StubLock();
-    return this.stub().returns(stubbedLock);
-  },
-  windowLocation() {
-    return [
-      window.location.protocol,
-      '//',
-      window.location.host,
-    ].join('');
-  }
-});
+    this.stubLock = function(stubbedLock) {
+      stubbedLock = stubbedLock || new StubLock();
+      return this.stub().returns(stubbedLock);
+    };
 
-test('it calculates the logoutURL correctly giving logoutReturnToURL precedence', function(assert) {
-  const config = this.registerConfig({
-    ['ember-simple-auth']: {
-      auth0: {
-        logoutReturnToURL: `${this.windowLocation()}/my-login`
+    this.windowLocation = function() {
+      return [
+        window.location.protocol,
+        '//',
+        window.location.host,
+      ].join('');
+    };
+  });
+
+  test('it calculates the logoutURL correctly giving logoutReturnToURL precedence', function(assert) {
+    const config = this.registerConfig({
+      ['ember-simple-auth']: {
+        auth0: {
+          logoutReturnToURL: `${this.windowLocation()}/my-login`
+        }
       }
-    }
+    });
+
+    let service = this.owner.lookup('service:auth0');
+    assert.equal(get(service, 'logoutReturnToURL'),
+      config['ember-simple-auth'].auth0.logoutReturnToURL);
   });
 
-  let service = this.subject();
-  assert.equal(get(service, 'logoutReturnToURL'),
-    config['ember-simple-auth'].auth0.logoutReturnToURL);
-});
+  test('showLock calls getUserInfo', function(assert) {
+    assert.expect(1);
+    const done = assert.async();
+    const stubbedLock = new StubLock();
+    const profile = {
+      user_id: '1',
+    };
+    const authenticatedData = {
+      idToken: '1.2.3',
+    };
 
-test('showLock calls getUserInfo', function(assert) {
-  assert.expect(1);
-  const done = assert.async();
-  const stubbedLock = new StubLock();
-  const profile = {
-    user_id: '1',
-  };
-  const authenticatedData = {
-    idToken: '1.2.3',
-  };
+    const expectedData = createSessionDataObject(profile, authenticatedData);
 
-  const expectedData = createSessionDataObject(profile, authenticatedData);
+    set(stubbedLock, 'profile', profile);
+    const subject = this.owner.factoryFor('service:auth0').create({
+      getAuth0LockInstance: this.stubLock(stubbedLock)
+    });
 
-  set(stubbedLock, 'profile', profile);
-  const subject = this.subject({
-    getAuth0LockInstance: this.stubLock(stubbedLock)
+    subject.showLock()
+      .then((data) => assert.deepEqual(data, expectedData))
+      .catch(() => assert.notOk(true))
+      .finally(done);
+
+    stubbedLock.trigger('authenticated', authenticatedData);
   });
 
-  subject.showLock()
-    .then((data) => assert.deepEqual(data, expectedData))
-    .catch(() => assert.notOk(true))
-    .finally(done);
+  test('showLock rejects when receiving an unrecoverable_error', function(assert) {
+    assert.expect(1);
+    const done = assert.async();
+    const stubbedLock = new StubLock();
+    const subject = this.owner.factoryFor('service:auth0').create({
+      getAuth0LockInstance: this.stubLock(stubbedLock)
+    });
 
-  stubbedLock.trigger('authenticated', authenticatedData);
-});
+    subject.showLock()
+      .then(() => assert.notOk(true))
+      .catch(() => assert.ok(true))
+      .finally(done);
 
-test('showLock rejects when receiving an unrecoverable_error', function(assert) {
-  assert.expect(1);
-  const done = assert.async();
-  const stubbedLock = new StubLock();
-  const subject = this.subject({
-    getAuth0LockInstance: this.stubLock(stubbedLock)
+    stubbedLock.trigger('unrecoverable_error', new Error());
   });
 
-  subject.showLock()
-    .then(() => assert.notOk(true))
-    .catch(() => assert.ok(true))
-    .finally(done);
+  test('showLock rejects when receiving an authorization_error', function(assert) {
+    assert.expect(1);
+    const done = assert.async();
+    const stubbedLock = new StubLock();
+    const subject = this.owner.factoryFor('service:auth0').create({
+      getAuth0LockInstance: this.stubLock(stubbedLock)
+    });
 
-  stubbedLock.trigger('unrecoverable_error', new Error());
-});
+    subject.showLock()
+      .then(() => assert.notOk(true))
+      .catch(() => assert.ok(true))
+      .finally(done);
 
-test('showLock rejects when receiving an authorization_error', function(assert) {
-  assert.expect(1);
-  const done = assert.async();
-  const stubbedLock = new StubLock();
-  const subject = this.subject({
-    getAuth0LockInstance: this.stubLock(stubbedLock)
+    stubbedLock.trigger('authorization_error', new Error());
   });
 
-  subject.showLock()
-    .then(() => assert.notOk(true))
-    .catch(() => assert.ok(true))
-    .finally(done);
+  test('showLock rejects when authenticatedData does not exist', function(assert) {
+    assert.expect(1);
+    const done = assert.async();
+    const stubbedLock = new StubLock();
+    const subject = this.owner.factoryFor('service:auth0').create({
+      getAuth0LockInstance: this.stubLock(stubbedLock)
+    });
 
-  stubbedLock.trigger('authorization_error', new Error());
-});
+    subject.showLock()
+      .then(() => assert.notOk(true))
+      .catch(() => assert.ok(true))
+      .finally(done);
 
-test('showLock rejects when authenticatedData does not exist', function(assert) {
-  assert.expect(1);
-  const done = assert.async();
-  const stubbedLock = new StubLock();
-  const subject = this.subject({
-    getAuth0LockInstance: this.stubLock(stubbedLock)
+    stubbedLock.trigger('authenticated');
   });
 
-  subject.showLock()
-    .then(() => assert.notOk(true))
-    .catch(() => assert.ok(true))
-    .finally(done);
+  test('showLock rejects when getUserInfo returns an error', function(assert) {
+    assert.expect(1);
+    const done = assert.async();
+    const stubbedLock = new StubLock({
+      shouldThrowGetUserInfoError: true
+    });
 
-  stubbedLock.trigger('authenticated');
-});
+    const subject = this.owner.factoryFor('service:auth0').create({
+      getAuth0LockInstance: this.stubLock(stubbedLock)
+    });
 
-test('showLock rejects when getUserInfo returns an error', function(assert) {
-  assert.expect(1);
-  const done = assert.async();
-  const stubbedLock = new StubLock({
-    shouldThrowGetUserInfoError: true
+    subject.showLock()
+      .then(() => assert.notOk(true))
+      .catch(() => assert.ok(true))
+      .finally(done);
+
+    stubbedLock.trigger('authenticated', { idToken: '1.2.3' });
   });
-
-  const subject = this.subject({
-    getAuth0LockInstance: this.stubLock(stubbedLock)
-  });
-
-  subject.showLock()
-    .then(() => assert.notOk(true))
-    .catch(() => assert.ok(true))
-    .finally(done);
-
-  stubbedLock.trigger('authenticated', { idToken: '1.2.3' });
 });
