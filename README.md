@@ -160,13 +160,9 @@ __Here is an example application route:__
 ```js
 // app/routes/application.js
 
-import Ember from 'ember';
+import Route from '@ember/routing/route';
+import RSVP from 'rsvp';
 import ApplicationRouteMixin from 'ember-simple-auth-auth0/mixins/application-route-mixin';
-
-const {
-  Route,
-  RSVP
-} = Ember;
 
 export default Route.extend(ApplicationRouteMixin, {
   beforeSessionExpired() {
@@ -183,16 +179,8 @@ __Add the session service to your application controller:__
 
 ```js
 // app/controllers/application.js
-
-import Ember from 'ember';
-
-const {
-  Controller,
-  inject: {
-    service
-  },
-  get
-} = Ember;
+import { inject as service } from '@ember/service';
+import Controller from '@ember/controller';
 
 export default Controller.extend({
   session: service(),
@@ -208,11 +196,11 @@ export default Controller.extend({
        }
       };
 
-      get(this, 'session').authenticate('authenticator:auth0-lock', lockOptions);
+      this.get('session').authenticate('authenticator:auth0-lock', lockOptions);
     },
 
     logout () {
-      get(this, 'session').invalidate();
+      this.get('session').invalidate();
     }
   }
 });
@@ -245,15 +233,8 @@ For more information on how to set up Passwordless auth server side and how to c
 ```js
 // app/controllers/application.js
 
-import Ember from 'ember';
-
-const {
-  Controller,
-  inject: {
-    service
-  },
-  get
-} = Ember;
+import Controller from '@ember/controller';
+import { inject as service } from '@ember/service';
 
 export default Controller.extend({
   session: service(),
@@ -269,13 +250,13 @@ export default Controller.extend({
        }
       };
 
-      get(this, 'session').authenticate('authenticator:auth0-lock-passwordless', lockOptions, (err, email) => {
+      this.get('session').authenticate('authenticator:auth0-lock-passwordless', lockOptions, (err, email) => {
         console.log(`Email link sent to ${email}!`)
       });
     },
 
     logout () {
-      get(this, 'session').invalidate();
+      this.get('session').invalidate();
     }
   }
 });
@@ -376,13 +357,8 @@ export default JSONAPIAdapter.extend(DataAdapterMixin, {
 ```js
 // app/routes/application.js
 
-import Ember from 'ember';
+import Route from '@ember/routing/route';
 import ApplicationRouteMixin from 'ember-simple-auth-auth0/mixins/application-route-mixin';
-
-const {
-  Route,
-  RSVP
-} = Ember;
 
 export default Route.extend(ApplicationRouteMixin, {
   model() {
@@ -471,16 +447,8 @@ The major **breaking change** is that the "type" parameter for the `auth0-lock-p
 
 ```js
 // app/controllers/application.js
-
-import Ember from 'ember';
-
-const {
-  Controller,
-  inject: {
-    service
-  },
-  get
-} = Ember;
+import Controller from '@ember/controller';
+import { inject as service } from '@ember/service';
 
 export default Controller.extend({
   session: service(),
@@ -495,7 +463,7 @@ export default Controller.extend({
        }
       };
 
-      get(this, 'session').authenticate('authenticator:auth0-lock-passwordless', 'magiclink', lockOptions, (err, email) => {
+      this.get('session').authenticate('authenticator:auth0-lock-passwordless', 'magiclink', lockOptions, (err, email) => {
         console.log(`Email link sent to ${email}!`)
       });
     },
@@ -511,13 +479,13 @@ export default Controller.extend({
        }
       };
 
-      get(this, 'session').authenticate('authenticator:auth0-lock-passwordless', lockOptions, (err, email) => {
+      this.get('session').authenticate('authenticator:auth0-lock-passwordless', lockOptions, (err, email) => {
         console.log(`Email link sent to ${email}!`)
       });
     },
 
     logout () {
-      get(this, 'session').invalidate();
+      this.get('session').invalidate();
     }
   }
 });
