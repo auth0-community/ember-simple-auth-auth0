@@ -345,7 +345,7 @@ Encountered an error from auth0 - {{model.error}} -- {{model.errorDescription}}
 
 ## Calling an API
 
-Use the `jwt` authorizer to get the user's token for API-calling purposes.
+The plugin `ember-simple-auth` provides the `authorize` hook to add the token of the user to the headers of the API request.
 
 See [server](./server) for an example of an express application getting called by the ember app.
 
@@ -354,20 +354,21 @@ An example using [ember-data](https://github.com/emberjs/data):
 `ember g adapter application`
 
 ```js
-import Ember from 'ember';
-import DS from 'ember-data';
+import JSONAPIAdapter from 'ember-data/adapters/json-api';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
-
-const {
-  computed
-} = Ember;
-
-const {
-  JSONAPIAdapter
-} = DS;
+import { computed } from '@ember/object';
+import { isPresent } from '@ember/utils';
+import { debug } from '@ember/debug';
 
 export default JSONAPIAdapter.extend(DataAdapterMixin, {
-  authorizer: 'authorizer:jwt',
+  authorize(xhr){
+    const { idToken } = this.get('session.data.authenticated');
+    if (isPresent(idToken)) {
+      xhr.setRequestHeader('Authorization', `Bearer ${idToken}`);
+    } else {
+      debug('Could not find the authorization token in the session data for the jwt authorizer.');
+    }
+  }
 });
 
 ```
