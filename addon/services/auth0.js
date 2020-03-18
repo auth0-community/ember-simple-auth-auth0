@@ -241,7 +241,7 @@ export default Service.extend({
 
     // [XA] shim for tests -- need to wait until the above 'authenticated'
     // listener is registered before triggering it during unit tests.
-    if (this.get('inTesting')) {
+    if (lock.trigger && this.get('inTesting')) {
       lock.trigger('_setupCompleted');
     }
   },
