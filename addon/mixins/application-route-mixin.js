@@ -117,6 +117,10 @@ export default Mixin.create(ApplicationRouteMixin, {
   },
 
   _scheduleRenew() {
+    if (!Ember.get(this, 'session.isAuthenticated')) {
+      this.sessionInvalidated();
+    }
+    
     const renewInMilli = this.auth0.silentAuthRenewSeconds * 1000;
     if(renewInMilli) {
       this._scheduleJob('_renewJob', this._processSessionRenewed, renewInMilli);
