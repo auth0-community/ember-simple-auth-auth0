@@ -1,0 +1,25 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "miguelcobain",
+      "name": "Miguel Andrade",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/631691?v=4",
+      "profile": "https://twitter.com/maskedwarrior",
+      "contributions": [
+        "maintenance",
+        "review",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "ember-simple-auth-auth0",
+  "projectOwner": "auth0-community",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
