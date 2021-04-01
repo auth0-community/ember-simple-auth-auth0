@@ -1,4 +1,5 @@
 # ember-simple-auth-auth0
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
 
 [![Build Status](https://travis-ci.org/auth0-community/ember-simple-auth-auth0.svg?branch=master)](https://travis-ci.org/seawatts/ember-simple-auth-auth0)
 [![Ember Observer Score](https://emberobserver.com/badges/ember-simple-auth-auth0.svg)](https://emberobserver.com/addons/ember-simple-auth-auth0)
@@ -814,3 +815,19 @@ For more information on using ember-cli, visit [https://ember-cli.com/](https://
 # License
 
 This project is licensed under the [MIT License](LICENSE.md).
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/XaserAcheron"><img src="https://avatars3.githubusercontent.com/u/4601589?v=4" width="100px;" alt="Xaser Acheron"/><br /><sub><b>Xaser Acheron</b></sub></a><br /><a href="https://github.com/auth0-community/ember-simple-auth-auth0/commits?author=XaserAcheron" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
