@@ -469,9 +469,9 @@ import { debug } from '@ember/debug';
 
 export default JSONAPIAdapter.extend(DataAdapterMixin, {
   authorize(xhr){
-    const { idToken } = this.get('session.data.authenticated');
-    if (isPresent(idToken)) {
-      xhr.setRequestHeader('Authorization', `Bearer ${idToken}`);
+    const { accessToken } = this.get('session.data.authenticated');
+    if (isPresent(accessToken)) {
+      xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
     } else {
       debug('Could not find the authorization token in the session data.');
     }
